@@ -40,7 +40,7 @@ $ sudo docker build -t="kalastack-docker" .
 2. Setting up environmental vars
 3. Accessing from your host browser
 
-You can find more images using the [Docker Index][https://index.docker.io/].
+You can find more images using the [Docker Index](https://index.docker.io/).
 
 
 ## Contributing
@@ -54,7 +54,7 @@ Feel free to fork and contribute to this code. :)
 
 ## Authors
 
-Forked from/based on the [drupal-docker-nginx](https://github.com/ricardoamaro/docker-drupal-nginx) project by  [Ricardo Amaro][https://github.com/ricardoamaro] (<mail@ricardoamaro.com>)
+Forked from/based on the [drupal-docker-nginx](https://github.com/ricardoamaro/docker-drupal-nginx) project by  [Ricardo Amaro](https://github.com/ricardoamaro) (<mail@ricardoamaro.com>)
 
 ## License
 GPL v3
