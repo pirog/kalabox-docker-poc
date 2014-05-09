@@ -35,10 +35,12 @@ $ cd kalastack-docker
 $ sudo docker build -t="kalastack-docker" .
 ```
 
-## MORE STUFF ONCE WE ARE g2g
+## MORE STUFF
+```
+$ docker run -i -e KALABOX_SERVER_NAME=test.stuff -p 0.0.0.0:80:8000 --name="test.stuff" kalastack-docker /start.sh -v
+```
+## ROADMAP
 1. Running the container with correct ports
-2. Setting up environmental vars
-3. Accessing from your host browser
 
 You can find more images using the [Docker Index](https://index.docker.io/).
 
