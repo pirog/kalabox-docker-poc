@@ -1,15 +1,16 @@
+# Very very basic webserver
+
 FROM    ubuntu:12.04
 MAINTAINER Mike Pirog <mike@kalamuna.com>
-RUN echo "deb http://archive.ubuntu.com/ubuntu precise main restricted universe multiverse" > /etc/apt/sources.list
+RUN echo "deb http://archive.ubuntu.com/ubuntu raring main restricted universe multiverse" > /etc/apt/sources.list
 RUN apt-get update
-#RUN apt-get -y upgrade
 
 # Keep upstart from complaining
 RUN dpkg-divert --local --rename --add /sbin/initctl
 RUN ln -s /bin/true /sbin/initctl
 
 # Basic Requirements
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install nginx php5-fpm php5-mysql php-apc
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install nginx php5-fpm python-setuptools
 
 # Drupal Requirements
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install php5-gd php5-intl php-pear php5-imap
@@ -27,6 +28,7 @@ RUN find /etc/php5/cli/conf.d/ -name "*.ini" -exec sed -i -re 's/^(\s*)#(.*)/\1;
 
 # nginx site conf
 ADD ./nginx-site.conf /etc/nginx/sites-available/default
+ADD ./index.php /var/www/index.php
 
 # Supervisor Config
 RUN /usr/bin/easy_install supervisor
