@@ -7,7 +7,7 @@ RUN apt-get update
 
 # Keep upstart from complaining
 RUN dpkg-divert --local --rename --add /sbin/initctl
-RUN ln -s /bin/true /sbin/initctl
+# RUN ln -s /bin/true /sbin/initctl
 
 # Basic Requirements
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install nginx php5-fpm python-setuptools
