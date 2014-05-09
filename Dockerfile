@@ -7,6 +7,7 @@ RUN apt-get update
 
 # Keep upstart from complaining
 RUN dpkg-divert --local --rename --add /sbin/initctl
+# We cant do this in 12.04
 # RUN ln -s /bin/true /sbin/initctl
 
 # Basic Requirements
