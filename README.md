@@ -8,7 +8,15 @@ built specifically for the [Kalabox](http://kalabox.kalamuna.com) project and fo
 
 ### Install boot2docker-cli
 
+We need to instantiate a docker environment in order to get all the docker magix.
+
 Start by [installing boot2docker-cli](https://github.com/boot2docker/boot2docker-cli).
+
+### Install kalabox-proxy
+
+We want users to be able to enter something like "site.local" in their host browsers instead of "192.168.59.103:49173" to access their site. In order to do this we need to set up
+a reverse proxy that sits in front of all the docker containers to route requests appropriately. As such you will need to pull down the kalabox-proxy container and run it. For more
+details on how to install the kalabox-proxy go [here](https://github.com/pirog/nginx-proxy)
 
 ### Pull/build container
 
@@ -29,8 +37,11 @@ $ docker build --tag="kalastack-docker" . #may need sudo?
 ```
 
 ### Start your container
+
+VIRTUAL_HOST and VIRTUAL_PORT tell the kalabox-proxy how to route your request. VIRTUAL_HOST should be the address you want to enter into your browser to access your site. VIRTUAL_PORT should almost always be 80. You will want to add an entry into your /etc/hosts file on the host side to facilitate the magic. Please consult "Your VM IP address" below for more details.
+
 ```
-$ docker run -d -p :22 -p :80 -p :3306 --name="sumptinawesome" kalastack-docker
+$ docker run -d -t -e VIRTUAL_HOST=sumptinawesome.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --name="sumptinawesome" kalastack-docker
 ```
 
 ## Service and IP discovery
@@ -39,11 +50,18 @@ In order to use most of the services inside your container you are going to want
 ### Your VM IP address
 
 Generally you can find this by `ifconfig` inside your docker vm. If you aren't doing anything weird this will usually be something like 192.168.59.103. You may also wish to check your boot2docker config
-to see if an alternate IP address is being used. You can do that by running `boot2docker config` on your host machine.
+to see if an alternate IP address is being used. You can do that by running `boot2docker config` on your host machine. Once you discover this IP address you want to add an entry into the /etc/hosts file
+on you hosts machine like this:
+
+```
+192.168.59.103 test.kala
+```
+
+Where 192.168.59.103 is the IP of your docker VM and test.kala is the VIRTUAL_HOST you defined when you ran a kalstack-docker container.
 
 ### Service Discovery
 
-You can run `docker ps` on your host machine to see what ports are doing in your container. This will help you access your services.
+You can run `docker ps` on your host machine to see what ports are doing in your container. This will help you access your services. I
 
 ```
 CONTAINER ID        IMAGE                     COMMAND               CREATED             STATUS              PORTS                                                                   NAMES
@@ -54,17 +72,17 @@ In the above example the following service mappings apply
 
 ```
 SSH   -> 22   -> 49171
-HTTP  -> 80   -> 49173
+HTTP  -> 3306 -> 49173
 MYSQL -> 3306 -> 49172
 ```
 
 Meaning you can connect to these services on your host machine in the following ways:
 
-1. HTTP  -> Navigate to 192.168.59.103:49173 in your browser
-2. SSH   -> Run `ssh -p 49171 root@192.168.59.103` (the default password should be kala)
-3. MYSQL -> Using your favorite mysql client use host: 192.168.59.103, port: 49172, user: root, pass: root.
+1. HTTP  -> Navigate to test.kala in your browser
+2. SSH   -> Run `ssh -p 49171 root@test.kala` (the default password should be kala)
+3. MYSQL -> Using your favorite mysql client use host: test.kala, port: 49172, user: root, pass: root.
 
-We are assuming your VM IP address is 192.168.59.103 in the above example.
+In this example we assume that you have set your VIRTUAL_HOST for the container to test.kala and you have also set up the appropriate /etc/hosts entry on your host machine.
 
 ## Contributing
 Feel free to fork and contribute to this code. :)
