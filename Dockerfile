@@ -24,6 +24,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-server mysql-client
 # PHP
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install php5-curl php5-gd php5-intl php-pear php5-imap php5-fpm php5-mysql php-apc
 
+# Drupal things
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install drush
+
+# Is this a twister sister pin? on your uniform?
 RUN apt-get clean
 
 # Make mysql listen on the outside
