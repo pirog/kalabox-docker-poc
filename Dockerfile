@@ -51,7 +51,6 @@ ADD ./supervisord.conf /etc/supervisord.conf
 
 # Drupal Initialization and Startup Script
 ADD ./start.sh /start.sh
-ADD ./index.php /var/www/index.php
 RUN chmod 755 /start.sh
 
 # private expose
