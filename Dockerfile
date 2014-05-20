@@ -10,10 +10,19 @@ RUN dpkg-divert --local --rename --add /sbin/initctl
 # RUN ln -s /bin/true /sbin/initctl
 
 # Basic Requirements
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-server mysql-client nginx php5-fpm php5-mysql php-apc python-setuptools curl
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python-setuptools curl openssh-server
+# Weird fix for SSH to D
+RUN mkdir -p /var/run/sshd
+RUN echo 'root:kala' |chpasswd
 
-# Drupal Requirements
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install php5-curl php5-gd php5-intl php-pear php5-imap mc
+# Webserver
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install nginx
+
+# Database
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-server mysql-client
+
+# PHP
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install php5-curl php5-gd php5-intl php-pear php5-imap php5-fpm php5-mysql php-apc
 
 RUN apt-get clean
 
@@ -42,6 +51,6 @@ ADD ./index.php /var/www/index.php
 RUN chmod 755 /start.sh
 
 # private expose
-EXPOSE 80
+EXPOSE 22 80 3306
 
 CMD ["/bin/bash", "/start.sh"]
