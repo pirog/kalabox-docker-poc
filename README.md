@@ -32,12 +32,12 @@ make goinstall
 ```
 $ git clone https://github.com/kalamuna/kalastack-docker.git
 $ cd kalastack-docker
-$ sudo docker build -t="kalastack-docker" .
+$ docker build --tag="kalastack-docker" . (may need sudo?)
 ```
 
 ## MORE STUFF
 ```
-$ docker run -i -e KALABOX_SERVER_NAME=test.stuff -p 0.0.0.0:80:8000 --name="test.stuff" kalastack-docker /start.sh -v
+$ docker run -i -p :80 -p :3306 --name="sumptinawesome" kalastack-docker /start.sh
 ```
 ## ROADMAP
 1. Running the container with correct ports
