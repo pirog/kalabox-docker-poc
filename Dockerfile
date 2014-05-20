@@ -1,4 +1,5 @@
-# Very very basic webserver
+# Kalastack-Docker
+# A magical Docker container for use with Kalabox
 
 FROM ubuntu:12.04
 MAINTAINER Mike Pirog <mike@kalamuna.com>
@@ -11,9 +12,15 @@ RUN dpkg-divert --local --rename --add /sbin/initctl
 
 # Basic Requirements
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python-setuptools curl openssh-server
+
 # Weird fix for SSH to D
 RUN mkdir -p /var/run/sshd
 RUN echo 'root:kala' |chpasswd
+
+# Prepare standard data directories for use by Kalabox
+RUN mkdir -p /data/data
+RUN mkdir -p /data/code
+RUN mkdir -p /data/files
 
 # Webserver
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install nginx
@@ -27,11 +34,17 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install php5-curl php5-gd php5-int
 # Drupal things
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install drush
 
-# Is this a twister sister pin? on your uniform?
+# Is this a Twister Sister pin? On your uniform?
 RUN apt-get clean
 
-# Make mysql listen on the outside
+# mysql config
 RUN sed -i "s/^bind-address/#bind-address/" /etc/mysql/my.cnf
+RUN sed -i "s,datadir.*=.*,datadir         = /data/data,g" /etc/mysql/my.cnf
+RUN rm -Rf /var/lib/mysql
+
+# apparmor config
+RUN echo "/data/data/ r," >> /etc/apparmor.d/local/usr.sbin.mysqld
+RUN echo "/data/data/** rwk," >> /etc/apparmor.d/local/usr.sbin.mysqld
 
 # nginx config
 RUN sed -i -e"s/keepalive_timeout\s*65/keepalive_timeout 2/" /etc/nginx/nginx.conf
