@@ -15,8 +15,15 @@ Start by [installing boot2docker-cli](https://github.com/boot2docker/boot2docker
 ### Install kalabox-proxy
 
 We want users to be able to enter something like "site.local" in their host browsers instead of "192.168.59.103:49173" to access their site. In order to do this we need to set up
-a reverse proxy that sits in front of all the docker containers to route requests appropriately. As such you will need to pull down the kalabox-proxy container and run it. For more
-details on how to install the kalabox-proxy go [here](https://github.com/pirog/nginx-proxy)
+a reverse proxy that sits in front of all the docker containers to route requests appropriately.
+
+As such you will need to pull down the kalabox-proxy container and run it. For more
+details on how to install the kalabox-proxy go [here](https://github.com/kalamuna/kalabox-proxy)
+
+### Install kaladata-docker
+
+We want users data to be stored outside of the docker container running the webserver so that webservers can be spun down, spun up, upgraded, swapped out, ec. In order to facilitate this
+users must instantiate a data-only container built specifically for Kalabox. To do so please follow the [installation instructions](https://github.com/kalamuna/kaladata-docker). You will want to give your data container a name you can remember such as 'sumptinawesome_data.' You will need this later when you mount this onto Kalastack
 
 ### Pull/build container
 
@@ -41,7 +48,7 @@ $ docker build --tag="pirog/kalastack-docker" . #may need sudo?
 VIRTUAL_HOST and VIRTUAL_PORT tell the kalabox-proxy how to route your request. VIRTUAL_HOST should be the address you want to enter into your browser to access your site. VIRTUAL_PORT should almost always be 80. You will want to add an entry into your /etc/hosts file on the host side to facilitate the magic. Please consult "Your VM IP address" below for more details.
 
 ```
-$ docker run -d -t -e VIRTUAL_HOST=sumptinawesome.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --name="sumptinawesome" pirog/kalastack-docker
+$ docker run -d -t -e VIRTUAL_HOST=sumptinawesome.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes=from="sumptinawesome_data" --name="sumptinawesome" pirog/kalastack-docker
 ```
 
 ## Service and IP discovery

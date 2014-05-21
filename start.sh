@@ -16,7 +16,7 @@ if [ ! -f /data/data/ibdata1 ]; then
     echo mysql root password: $MYSQL_PASSWORD
 
     # Install a base DB for DRUPAL
-    mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DB;"
+    mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DB; GRANT ALL PRIVILEGES ON $MYSQL_DB.* TO '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD'; FLUSH PRIVILEGES;"
 
     killall mysqld
     sleep 10s

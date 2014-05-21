@@ -17,11 +17,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python-setuptools curl ope
 RUN mkdir -p /var/run/sshd
 RUN echo 'root:kala' |chpasswd
 
-# Prepare standard data directories for use by Kalabox
-RUN mkdir -p /data/data
-RUN mkdir -p /data/code
-RUN mkdir -p /data/files
-
 # Webserver
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install nginx
 
