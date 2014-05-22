@@ -10,26 +10,40 @@ RUN apt-get update
 RUN dpkg-divert --local --rename --add /sbin/initctl
 # RUN ln -s /bin/true /sbin/initctl
 
-# Basic Requirements
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python-setuptools curl openssh-server
+# Basic requirements for Kalabox/Switchboard-based containers
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git rsync curl openssh-server php5 php5-curl php5-mcrypt mysql-client python-setuptools
+# Install composer and set it vendor dir to $PATH
+RUN curl -sS https://getcomposer.org/installer | php
+RUN mv composer.phar /usr/local/bin/composer
+
+# RUN source $HOME/.bashrc
+# Install DRUSH and Switchboard
+# RUN composer global require drush/drush:6.*
+
+# Download Switchboard.
+# RUN git clone https://github.com/fluxsauce/switchboard.git $HOME/.drush/switchboard
+# Download dependencies.
+# RUN cd $HOME/.drush/switchboard
+# RUN composer update --no-dev
+# Clear Drush's cache.
+# RUN drush cc drush
 
 # Weird fix for SSH to D
 RUN mkdir -p /var/run/sshd
 RUN echo 'root:kala' |chpasswd
 
+# Switchboard depenc
+
 # Webserver
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install nginx
 
 # Database
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-server mysql-client
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-server
 
 # PHP
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install php5-curl php5-gd php5-intl php-pear php5-imap php5-fpm php5-mysql php-apc
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install php5-gd php5-intl php-pear php5-imap php5-fpm php5-mysql php-apc
 
-# Drupal things
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install drush
-
-# Is this a Twister Sister pin? On your uniform?
+# Is this a Twisted Sister pin? On your uniform?
 RUN apt-get clean
 
 # mysql config

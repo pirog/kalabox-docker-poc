@@ -48,7 +48,7 @@ $ docker build --tag="pirog/kalastack-docker" . #may need sudo?
 VIRTUAL_HOST and VIRTUAL_PORT tell the kalabox-proxy how to route your request. VIRTUAL_HOST should be the address you want to enter into your browser to access your site. VIRTUAL_PORT should almost always be 80. You will want to add an entry into your /etc/hosts file on the host side to facilitate the magic. Please consult "Your VM IP address" below for more details.
 
 ```
-$ docker run -d -t -e VIRTUAL_HOST=sumptinawesome.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes=from="sumptinawesome_data" --name="sumptinawesome" pirog/kalastack-docker
+$ docker run -d -t -e VIRTUAL_HOST=sumptinawesome.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes-from="sumptinawesome_data" --name="sumptinawesome" pirog/kalastack-docker
 ```
 
 ## Service and IP discovery
