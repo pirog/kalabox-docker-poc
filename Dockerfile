@@ -11,28 +11,22 @@ RUN dpkg-divert --local --rename --add /sbin/initctl
 # RUN ln -s /bin/true /sbin/initctl
 
 # Basic requirements for Kalabox/Switchboard-based containers
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git rsync curl openssh-server php5 php5-curl php5-mcrypt mysql-client python-setuptools
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git rsync curl openssh-server php5 php5-curl php5-mcrypt mysql-client python-setuptools libc6-i386
 # Install composer and set it vendor dir to $PATH
 RUN curl -sS https://getcomposer.org/installer | php
 RUN mv composer.phar /usr/local/bin/composer
-
-# RUN source $HOME/.bashrc
+# Prepare directories for composer
+RUN mkdir -p /usr/share/composer
+ENV COMPOSER_HOME /usr/share/composer
+ENV COMPOSER_BIN_DIR /usr/local/bin
 # Install DRUSH and Switchboard
-# RUN composer global require drush/drush:6.*
-
-# Download Switchboard.
-# RUN git clone https://github.com/fluxsauce/switchboard.git $HOME/.drush/switchboard
-# Download dependencies.
-# RUN cd $HOME/.drush/switchboard
-# RUN composer update --no-dev
-# Clear Drush's cache.
-# RUN drush cc drush
-
+RUN composer global require drush/drush:6.*
+RUN git clone https://github.com/fluxsauce/switchboard.git /usr/share/composer/vendor/drush/drush/commands/switchboard
+RUN cd /usr/share/composer/vendor/drush/drush/commands/switchboard && composer update --no-dev
+RUN drush cc drush
 # Weird fix for SSH to D
 RUN mkdir -p /var/run/sshd
 RUN echo 'root:kala' |chpasswd
-
-# Switchboard depenc
 
 # Webserver
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install nginx
@@ -78,4 +72,5 @@ RUN chmod 755 /start.sh
 # private expose
 EXPOSE 22 80 3306
 
+# NOW IS THE TIME ON SPROCKETS WHERE WE DANCE
 CMD ["/bin/bash", "/start.sh"]
