@@ -21,7 +21,7 @@ On the docker vm
 ```
 $ docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock -t pirog/kalabox-proxy
 $ docker run --name=test_data pirog/kaladata-docker
-$ docker run -d -t -e VIRTUAL_HOST=test.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes-from="test_data" --name="test.kala" pirog/kalastack-docker:12.04
+$ docker run -d -t -e VIRTUAL_HOST=test.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes-from="test_data" --name="test.kala" --hostname="test.kala" pirog/kalastack-docker:12.04
 ```
 
 Skip below to *Your VM IP address*
@@ -45,7 +45,7 @@ details on how to install the kalabox-proxy go [here](https://github.com/kalamun
 ### Install kaladata-docker
 
 We want users data to be stored outside of the docker container running the webserver so that webservers can be spun down, spun up, upgraded, swapped out, ec. In order to facilitate this
-users must instantiate a data-only container built specifically for Kalabox. To do so please follow the [installation instructions](https://github.com/kalamuna/kaladata-docker). You will want to give your data container a name you can remember such as 'sumptinawesome_data.' You will need this later when you mount this onto Kalastack
+users must instantiate a data-only container built specifically for Kalabox. To do so please follow the [installation instructions](https://github.com/kalamuna/kaladata-docker). You will want to give your data container a name you can remember such as 'test_data.' You will need this later when you mount this onto Kalastack
 
 ### Pull/build container
 
@@ -62,7 +62,7 @@ To build from source run the following
 ```
 $ git clone https://github.com/kalamuna/kalastack-docker.git
 $ cd kalastack-docker
-$ docker build --tag="pirog/kalastack-docker" . #may need sudo?
+$ docker build --tag="pirog/kalastack-docker" .
 ```
 
 ### Start your container
@@ -70,7 +70,7 @@ $ docker build --tag="pirog/kalastack-docker" . #may need sudo?
 VIRTUAL_HOST and VIRTUAL_PORT tell the kalabox-proxy how to route your request. VIRTUAL_HOST should be the address you want to enter into your browser to access your site. VIRTUAL_PORT should almost always be 80. You will want to add an entry into your /etc/hosts file on the host side to facilitate the magic. Please consult "Your VM IP address" below for more details.
 
 ```
-$ docker run -d -t -e VIRTUAL_HOST=test.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes-from="sumptinawesome_data" --name="sumptinawesome" pirog/kalastack-docker:12.04
+$ docker run -d -t -e VIRTUAL_HOST=test.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes-from="test_data" --name="test.kala" --hostname="test.kala" pirog/kalastack-docker:12.04
 ```
 
 ## Service and IP discovery
@@ -94,7 +94,7 @@ You can run `docker ps` on your host machine to see what ports are doing in your
 
 ```
 CONTAINER ID        IMAGE                     COMMAND               CREATED             STATUS              PORTS                                                                   NAMES
-c69959c355ae        kalastack-docker:latest   /bin/bash /start.sh   2 seconds ago       Up 1 seconds        0.0.0.0:49171->22/tcp, 0.0.0.0:49172->3306/tcp, 0.0.0.0:49173->80/tcp   sumptinawesome
+c69959c355ae        kalastack-docker:12.04   /bin/bash /start.sh   2 seconds ago       Up 1 seconds        0.0.0.0:49171->22/tcp, 0.0.0.0:49172->3306/tcp, 0.0.0.0:49173->80/tcp   test.kala
 ```
 
 In the above example the following service mappings apply
