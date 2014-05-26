@@ -4,7 +4,29 @@ Kalastack Docker
 This repo contains the source for a [Kalastack-like](https://github.com/kalamuna/kalastack/) Drupal stack using [Docker](http://docker.io) container technology for Drupal. It was
 built specifically for the [Kalabox](http://kalabox.kalamuna.com) project and for use with [boot2docker-cli](https://github.com/boot2docker/boot2docker-cli).
 
-## Installation
+## Quick Start
+
+We have provided a script to help you get started really easily. Right now this startup script has only been tested on MacOSX 1.9+
+
+On your host machine
+```
+$ cd ~
+$ git clone https://github.com/kalamuna/kalastack-docker.git
+$ cd kalastack-docker/macosx
+$ ./setup.sh
+$ boot2docker ssh #this will ssh you into the docker vm
+```
+
+On the docker vm
+```
+$ docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock -t pirog/kalabox-proxy
+$ docker run --name=test_data pirog/kaladata-docker
+$ docker run -d -t -e VIRTUAL_HOST=test.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes-from="test_data" --name="test.kala" pirog/kalastack-docker:12.04
+```
+
+Skip below to *Your VM IP address*
+
+## Manual Installation
 
 ### Install boot2docker-cli
 
@@ -48,7 +70,7 @@ $ docker build --tag="pirog/kalastack-docker" . #may need sudo?
 VIRTUAL_HOST and VIRTUAL_PORT tell the kalabox-proxy how to route your request. VIRTUAL_HOST should be the address you want to enter into your browser to access your site. VIRTUAL_PORT should almost always be 80. You will want to add an entry into your /etc/hosts file on the host side to facilitate the magic. Please consult "Your VM IP address" below for more details.
 
 ```
-$ docker run -d -t -e VIRTUAL_HOST=sumptinawesome.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes-from="sumptinawesome_data" --name="sumptinawesome" pirog/kalastack-docker:12.04
+$ docker run -d -t -e VIRTUAL_HOST=test.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes-from="sumptinawesome_data" --name="sumptinawesome" pirog/kalastack-docker:12.04
 ```
 
 ## Service and IP discovery
@@ -56,15 +78,15 @@ In order to use most of the services inside your container you are going to want
 
 ### Your VM IP address
 
-Generally you can find this by `ifconfig` inside your docker vm. If you aren't doing anything weird this will usually be something like 192.168.59.103. You may also wish to check your boot2docker config
+Generally you can find this by `ifconfig` inside your docker vm. If you aren't doing anything weird this will usually be something like 1.3.3.8. You may also wish to check your boot2docker config
 to see if an alternate IP address is being used. You can do that by running `boot2docker config` on your host machine. Once you discover this IP address you want to add an entry into the /etc/hosts file
 on you hosts machine like this:
 
 ```
-192.168.59.103 test.kala
+1.3.3.8 test.kala
 ```
 
-Where 192.168.59.103 is the IP of your docker VM and test.kala is the VIRTUAL_HOST you defined when you ran a kalstack-docker container.
+Where 1.3.3.8 is the IP of your docker VM and test.kala is the VIRTUAL_HOST you defined when you ran a kalstack-docker container.
 
 ### Service Discovery
 
