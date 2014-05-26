@@ -24,7 +24,7 @@ RUN cd /usr/share/composer/vendor/drush/drush/commands/switchboard && composer u
 RUN drush cc drush
 # Weird fix for SSH to D
 RUN mkdir -p /var/run/sshd
-RUN echo 'root:kala' |chpasswd
+RUN echo 'root:kala' | chpasswd
 
 # Webserver
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install nginx

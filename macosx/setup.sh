@@ -82,7 +82,8 @@ if [ "$my_answer" == "1" ]; then
     if [ -a $HOME/.boot2docker/boot2docker.iso ]; then
         rm $HOME/.boot2docker/boot2docker.iso
     fi
-    cp -f boot2docker.profile /$HOME/.boot2docker/profile
+    cp -f boot2docker.profile $HOME/.boot2docker
+    mv -f $HOME/.boot2docker/boot2docker.profile $HOME/.boot2docker/profile
     /usr/local/bin/boot2docker init
     /usr/local/bin/boot2docker up
 
