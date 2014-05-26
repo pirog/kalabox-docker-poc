@@ -3,6 +3,8 @@
 
 FROM ubuntu:12.04
 MAINTAINER Mike Pirog <mike@kalamuna.com>
+
+RUN echo "deb http://archive.ubuntu.com/ubuntu raring main restricted universe multiverse" > /etc/apt/sources.list
 RUN apt-get update
 
 # Keep upstart from complaining
