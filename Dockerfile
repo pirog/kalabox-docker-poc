@@ -1,7 +1,7 @@
 # Kalastack-Docker
 # A magical Docker container for use with Kalabox
 
-FROM ubuntu:14.04
+FROM ubuntu:12.04
 MAINTAINER Mike Pirog <mike@kalamuna.com>
 RUN apt-get update
 
@@ -9,7 +9,7 @@ RUN apt-get update
 RUN dpkg-divert --local --rename --add /sbin/initctl
 
 # Basic requirements for Kalabox/Switchboard-based containers
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git rsync curl openssh-server php5 php5-curl php5-mcrypt mysql-client python-setuptools
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git rsync curl openssh-server php5 php5-curl php5-sqlite php5-mcrypt mysql-client python-setuptools
 # Install composer and set it vendor dir to $PATH
 RUN curl -sS https://getcomposer.org/installer | php
 RUN mv composer.phar /usr/local/bin/composer
