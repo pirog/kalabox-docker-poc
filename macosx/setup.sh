@@ -79,11 +79,19 @@ fi
 #!/usr/bin/env bash
 if [ "$my_answer" == "1" ]; then
     echo "Spinning up the hypervisor..."
-    if [ -a $HOME/.boot2docker/boot2docker.iso ]; then
-        rm $HOME/.boot2docker/boot2docker.iso
+    B2D_DIR=$HOME/.boot2docker
+    if [ ! -d "$B2D_DIR" ]; then
+        mkdir -p "$B2D_DIR"
     fi
+    if [ -a $B2D_DIR/boot2docker.iso ]; then
+        rm $B2D_DIR/boot2docker.iso
+    fi
+    # @todo eventually we want to do something less instrusive like this
+    # export BOOT2DOCKER_PROFILE=$(pwd)/boot2docker.profile
+    # unset BOOT2DOCKER_PROFILE
     cp -f boot2docker.profile $HOME/.boot2docker
     mv -f $HOME/.boot2docker/boot2docker.profile $HOME/.boot2docker/profile
+    cd $HOME
     /usr/local/bin/boot2docker init
     /usr/local/bin/boot2docker up
 
