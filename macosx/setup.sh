@@ -10,6 +10,7 @@
 
 # Override any funny stuff from the user.
 export PATH="/bin:/usr/bin:/sbin:/usr/sbin:$PATH"
+SCRIPT_DIR=$(pwd)
 
 ## @param [Integer] $1 exit code.
 function key_exit() {
@@ -45,14 +46,14 @@ echo "because some of the installed files cannot be removed by a"
 echo "normal user. You may now be prompted for a password..."
 
 # Just start the sudo party
-/usr/bin/sudo -p "Please enter %u's password:" echo "Let's get it started"
+sudo -p "Please enter %u's password:" echo "Let's get it started"
 
 # Install VirtualBox
 VBOX=$(which VBoxManage)
 if [ -z "$VBOX" ]; then
     echo "Downloading VirtualBox..."
     cd /tmp
-    /usr/bin/curl -O http://files.kalamuna.com/virtualbox-macosx-4.3.6.dmg
+    curl -O http://files.kalamuna.com/virtualbox-macosx-4.3.6.dmg
     echo "Mounting VirtualBox..."
     if [ -d /Volumes/VirtualBox ]; then
         hdiutil detach /Volumes/VirtualBox -force
@@ -69,7 +70,7 @@ B2D=$(which boot2docker)
 if [ -z "$B2D" ]; then
     echo "Downloading Boot2Docker..."
     cd /tmp
-    /usr/bin/curl -O http://files.kalamuna.com/boot2docker-v0.9.2-darwin-amd64
+    curl -O http://files.kalamuna.com/boot2docker-v0.9.2-darwin-amd64
     echo "Installing Boot2Docker..."
     sudo mv /tmp/boot2docker-v0.9.2-darwin-amd64 /usr/local/bin/boot2docker
     sudo chmod +x /usr/local/bin/boot2docker
@@ -89,22 +90,25 @@ if [ "$my_answer" == "1" ]; then
     # @todo eventually we want to do something less instrusive like this
     # export BOOT2DOCKER_PROFILE=$(pwd)/boot2docker.profile
     # unset BOOT2DOCKER_PROFILE
-    cp -f boot2docker.profile $HOME/.boot2docker
+    # For now we need to overwrite the default settings to ensure pegging
+    cp -f $SCRIPT_DIR/boot2docker.profile $HOME/.boot2docker
     mv -f $HOME/.boot2docker/boot2docker.profile $HOME/.boot2docker/profile
+
+    # Build the Docker VM
     cd $HOME
-    /usr/local/bin/boot2docker init
-    /usr/local/bin/boot2docker up
+    boot2docker init
+    boot2docker up
 
     # Get all our images
     # Data only container
-    /usr/bin/curl -XPOST http://localhost:4243/images/create --data fromImage=busybox --data tag=latest
-    /usr/bin/curl -XPOST http://localhost:4243/images/create --data fromImage=pirog/kaladata-docker --data tag=latest
+    curl -XPOST http://localhost:4243/images/create --data fromImage=busybox --data tag=latest
+    curl -XPOST http://localhost:4243/images/create --data fromImage=pirog/kaladata-docker --data tag=latest
     # Ubuntu 12.04
-    /usr/bin/curl -XPOST http://localhost:4243/images/create --data fromImage=ubuntu --data tag=12.04
+    curl -XPOST http://localhost:4243/images/create --data fromImage=ubuntu --data tag=12.04
     # Reverse Proxy
-    /usr/bin/curl -XPOST http://localhost:4243/images/create --data fromImage=pirog/kalabox-proxy --data tag=latest
+    curl -XPOST http://localhost:4243/images/create --data fromImage=pirog/kalabox-proxy --data tag=latest
     # Kalastack Docker
-    /usr/bin/curl -XPOST http://localhost:4243/images/create --data fromImage=pirog/kalastack-docker --data tag=12.04
+    curl -XPOST http://localhost:4243/images/create --data fromImage=pirog/kalastack-docker --data tag=12.04
 
     # Set up the reverse proxy
     #json=$(/usr/bin/curl -XPOST -H "Content-Type: application/json" http://localhost:4243/containers/create -d '
