@@ -41,8 +41,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install php5-gd php5-intl php-pear
 RUN apt-get clean
 
 # mysql config
-RUN sed -i "s/^bind-address/#bind-address/" /etc/mysql/my.cnf
-RUN sed -i "s,datadir.*=.*,datadir         = /data/data,g" /etc/mysql/my.cnf
+ADD ./my.cnf /etc/mysql/conf.d/kalabox.cnf
 RUN rm -Rf /var/lib/mysql
 
 # apparmor config
@@ -52,14 +51,18 @@ RUN echo "/data/data/** rwk," >> /etc/apparmor.d/local/usr.sbin.mysqld
 # nginx config
 RUN sed -i -e"s/keepalive_timeout\s*65/keepalive_timeout 2/" /etc/nginx/nginx.conf
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
+ADD ./nginx-site.conf /etc/nginx/sites-available/default
 
 # php-fpm config
 RUN sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" /etc/php5/fpm/php.ini
 RUN sed -i -e "s/;daemonize\s*=\s*yes/daemonize = no/g" /etc/php5/fpm/php-fpm.conf
+RUN sed -i -e "s/memory_limit = 128M/memory_limit = 512M/g" /etc/php5/fpm/php.ini
+RUN sed -i -e "s/post_max_size = 8M/post_max_size = 100M/g" /etc/php5/fpm/php.ini
+RUN sed -i -e "s/upload_max_filesize = 2M/upload_max_filesize = 100M/g" /etc/php5/fpm/php.ini
 RUN find /etc/php5/cli/conf.d/ -name "*.ini" -exec sed -i -re 's/^(\s*)#(.*)/\1;\2/g' {} \;
-
-# nginx site conf
-ADD ./nginx-site.conf /etc/nginx/sites-available/default
+# APC
+RUN sed -i '$a apc.shm_size=128M' /etc/php5/conf.d/20-apc.ini
+RUN sed -i '$a apc.include_once_override=0' /etc/php5/conf.d/20-apc.ini
 
 # Supervisor Config
 RUN /usr/bin/easy_install supervisor
