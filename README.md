@@ -14,7 +14,7 @@ $ cd ~
 $ git clone https://github.com/kalamuna/kalastack-docker.git
 $ cd kalastack-docker/macosx
 $ ./setup.sh
-$ boot2docker ssh #this will ssh you into the docker vm
+$ boot2docker ssh # this will ssh you into the docker vm where you should do the below:
 ```
 
 On the docker vm
@@ -24,7 +24,85 @@ $ docker run --name=test_data pirog/kaladata-docker
 $ docker run -d -t -e VIRTUAL_HOST=test.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes-from="test_data" --name="test.kala" --hostname="test.kala" pirog/kalastack-docker:12.04
 ```
 
-Skip below to *Your VM IP address*
+In order to access your webserver in your browser you wil want to add an entry into your /etc/hosts file. In order to do this you need to find the docker vm ip address.
+Generally you can find this by running `ifconfig` inside your docker vm. If you aren't doing anything weird this will usually be something like 1.3.3.7. You may also wish to check your boot2docker config to see if an alternate IP address is being used. You can do that by running `boot2docker config` on your host machine. Once you discover this IP address you want to add an entry into the /etc/hosts file on you hosts machine like this:
+
+```
+1.3.3.7 test.kala
+```
+
+## Useful Things
+
+### Connecting to SSH, MySQL and other services
+
+You can run `docker ps` inside the docker vm to see what ports are doing in your container. This will help you access your services.
+
+```
+CONTAINER ID        IMAGE                     COMMAND               CREATED             STATUS              PORTS                                                                   NAMES
+c69959c355ae        kalastack-docker:12.04   /bin/bash /start.sh   2 seconds ago       Up 1 seconds        0.0.0.0:49171->22/tcp, 0.0.0.0:49172->3306/tcp, 0.0.0.0:49173->80/tcp   test.kala
+```
+
+In the above example the following service mappings apply
+
+```
+SSH   -> 22   -> 49171
+HTTP  -> 3306 -> 49173
+MYSQL -> 3306 -> 49172
+```
+
+Meaning you can connect to these services on your host machine in the following ways:
+
+1. HTTP  -> Navigate to test.kala in your browser
+2. SSH   -> Run `ssh -p 49171 root@test.kala` (the default password should be kala)
+3. MYSQL -> Using your favorite mysql client use host: test.kala, port: 49172, user: root, pass: root.
+
+In this example we assume that you have set your VIRTUAL_HOST for the container to test.kala and you have also set up the appropriate /etc/hosts entry on your host machine.
+
+### Building a Drupal site
+
+The easiest way to build a Drupal site is to ssh into your container and navigate to your code by running `cd /data/code`. Once you are in here you can build a site from Acquia or Pantheon by
+using the [Switchboard](https://github.com/fluxsauce/switchboard) or by pulling a site down with curl, wget or git.
+
+### Sharing Code with your Host
+
+Most people like to use the text-editor or IDE on their host machine. Kalastack-docker does not provide any file sharing with your host out of the box but you can download a copy of your
+code onto your host machine and sync it into your container with
+
+```
+$ scp -rp -P 49171 ~/mycode/* root@test.kala:/data/code/
+```
+
+Remember to use the correct SSH port for your container.
+
+### Debugging Code
+
+As long as you use the setup script above or set your boot2docker host-only network host IP to 1.3.3.1 you can use xdebug out of the box with kalastack-docker. Of course, you will
+want to follow the normal procedure for setting up debug config for your text editor/IDE. In SublimeText2 the config looks something like this:
+
+```
+{
+  "folders":
+  [
+    {
+      "path": "/Users/mpirog/mycode"
+    }
+  ],
+  "settings":
+  {
+    "xdebug":
+    {
+      "super_globals": true,
+      "close_on_stop": true,
+      "path_mapping":
+      {
+        "/data/code/": "/Users/mpirog/mycode/"
+      },
+      "port": 9000,
+      "url": "http://test.kala"
+    }
+  }
+}
+```
 
 ## Manual Installation
 
@@ -72,46 +150,6 @@ VIRTUAL_HOST and VIRTUAL_PORT tell the kalabox-proxy how to route your request. 
 ```
 $ docker run -d -t -e VIRTUAL_HOST=test.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes-from="test_data" --name="test.kala" --hostname="test.kala" pirog/kalastack-docker:12.04
 ```
-
-## Service and IP discovery
-In order to use most of the services inside your container you are going to want to know the IP address of the docker VM and also the ports to access them.
-
-### Your VM IP address
-
-Generally you can find this by `ifconfig` inside your docker vm. If you aren't doing anything weird this will usually be something like 1.3.3.8. You may also wish to check your boot2docker config
-to see if an alternate IP address is being used. You can do that by running `boot2docker config` on your host machine. Once you discover this IP address you want to add an entry into the /etc/hosts file
-on you hosts machine like this:
-
-```
-1.3.3.8 test.kala
-```
-
-Where 1.3.3.8 is the IP of your docker VM and test.kala is the VIRTUAL_HOST you defined when you ran a kalstack-docker container.
-
-### Service Discovery
-
-You can run `docker ps` on your host machine to see what ports are doing in your container. This will help you access your services. I
-
-```
-CONTAINER ID        IMAGE                     COMMAND               CREATED             STATUS              PORTS                                                                   NAMES
-c69959c355ae        kalastack-docker:12.04   /bin/bash /start.sh   2 seconds ago       Up 1 seconds        0.0.0.0:49171->22/tcp, 0.0.0.0:49172->3306/tcp, 0.0.0.0:49173->80/tcp   test.kala
-```
-
-In the above example the following service mappings apply
-
-```
-SSH   -> 22   -> 49171
-HTTP  -> 3306 -> 49173
-MYSQL -> 3306 -> 49172
-```
-
-Meaning you can connect to these services on your host machine in the following ways:
-
-1. HTTP  -> Navigate to test.kala in your browser
-2. SSH   -> Run `ssh -p 49171 root@test.kala` (the default password should be kala)
-3. MYSQL -> Using your favorite mysql client use host: test.kala, port: 49172, user: root, pass: root.
-
-In this example we assume that you have set your VIRTUAL_HOST for the container to test.kala and you have also set up the appropriate /etc/hosts entry on your host machine.
 
 ## Contributing
 Feel free to fork and contribute to this code. :)

@@ -35,7 +35,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install nginx
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-server
 
 # PHP
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install php5-gd php5-intl php-pear php5-imap php5-fpm php5-mysql php-apc
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install php5-gd php5-intl php-pear php5-imap php5-fpm php5-mysql php-apc php5-xdebug
 
 # Is this a Twisted Sister pin? On your uniform?
 RUN apt-get clean
@@ -60,9 +60,17 @@ RUN sed -i -e "s/memory_limit = 128M/memory_limit = 512M/g" /etc/php5/fpm/php.in
 RUN sed -i -e "s/post_max_size = 8M/post_max_size = 100M/g" /etc/php5/fpm/php.ini
 RUN sed -i -e "s/upload_max_filesize = 2M/upload_max_filesize = 100M/g" /etc/php5/fpm/php.ini
 RUN find /etc/php5/cli/conf.d/ -name "*.ini" -exec sed -i -re 's/^(\s*)#(.*)/\1;\2/g' {} \;
-# APC
+# php5-apc
 RUN sed -i '$a apc.shm_size=128M' /etc/php5/conf.d/20-apc.ini
 RUN sed -i '$a apc.include_once_override=0' /etc/php5/conf.d/20-apc.ini
+# php5-xdebug
+# @todo this assumes 1.3.3.1 is your host machine, need to abstract out
+# in the future
+RUN sed -i '$a xdebug.remote_host="1.3.3.1"' /etc/php5/conf.d/20-xdebug.ini
+RUN sed -i '$a xdebug.remote_enable=1' /etc/php5/conf.d/20-xdebug.ini
+RUN sed -i '$a xdebug.remote_port=9000' /etc/php5/conf.d/20-xdebug.ini
+RUN sed -i '$a xdebug.remote_handler="dbgp"' /etc/php5/conf.d/20-xdebug.ini
+RUN sed -i '$a xdebug.remote_autostart=1' /etc/php5/conf.d/20-xdebug.ini
 
 # Supervisor Config
 RUN /usr/bin/easy_install supervisor
