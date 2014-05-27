@@ -74,6 +74,18 @@ $ scp -rp -P 49171 ~/mycode/* root@test.kala:/data/code/
 
 Remember to use the correct SSH port for your container.
 
+
+### SSH Key Forwarding
+
+For now the easiest way to forward your keys into any kalastack-docker is to add the following lines to your ~/.ssh/config file
+
+```
+Host *.kala
+  ForwardAgent yes
+```
+
+This assumes that your VIRTUAL_HOST is set to something.kala when you run your container.
+
 ### Debugging Code
 
 As long as you use the setup script above or set your boot2docker host-only network host IP to 1.3.3.1 you can use xdebug out of the box with kalastack-docker. Of course, you will
