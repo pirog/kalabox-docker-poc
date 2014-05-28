@@ -68,8 +68,14 @@ using the [Switchboard](https://github.com/fluxsauce/switchboard) or by pulling 
 Most people like to use the text-editor or IDE on their host machine. Kalastack-docker does not provide any file sharing with your host out of the box but you can download a copy of your
 code onto your host machine and sync it into your container with
 
+With scp
 ```
 $ scp -rp -P 49171 ~/mycode/* root@test.kala:/data/code/
+```
+
+With rsync over ssh
+```
+rsync -ravz -e "ssh -p 49171 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" --progress ~/mycode/* root@test.kala:/data/code/
 ```
 
 Remember to use the correct SSH port for your container.
