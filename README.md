@@ -75,7 +75,7 @@ $ scp -rp -P 49171 ~/mycode/* root@test.kala:/data/code/
 
 With rsync over ssh
 ```
-rsync -ravz -e "ssh -p 49171 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" --delete --progress ~/mycode/* root@test.kala:/data/code/
+rsync -ravz -e "ssh -p 49171 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" --delete --progress --exclude 'sites/default/files' ~/mycode/* root@test.kala:/data/code/
 ```
 
 Remember to use the correct SSH port for your container.
