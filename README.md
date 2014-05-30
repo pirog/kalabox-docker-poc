@@ -169,6 +169,19 @@ VIRTUAL_HOST and VIRTUAL_PORT tell the kalabox-proxy how to route your request. 
 $ docker run -d -t -e VIRTUAL_HOST=test.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes-from="test_data" --name="test.kala" --hostname="test.kala" pirog/kalastack-docker:12.04
 ```
 
+## Uninstall
+
+The best way to uninstall this whole thing either because you hate it or to try to reinstall is to run the following commands from your host machine
+
+```
+$ boot2docker stop
+$ boot2docker delete
+$ sudo rm /usr/local/bin/boot2docker
+$ rm -rf ~/.boot2docker
+```
+
+Optionally, and if you are feeling RISKY. You can uninstall VirtualBox with teh uninstall.tool that ships with the VB DMG.
+
 ## Contributing
 Feel free to fork and contribute to this code. :)
 
