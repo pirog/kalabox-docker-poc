@@ -10,18 +10,24 @@ We have provided a script to help you get started really easily. Right now this 
 
 On your host machine
 ```
-$ cd ~
-$ git clone https://github.com/kalamuna/kalastack-docker.git
-$ cd kalastack-docker/macosx
-$ ./setup.sh
-$ boot2docker ssh # this will ssh you into the docker vm where you should do the below:
-```
-
-On the docker vm
-```
-$ docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock -t pirog/kalabox-proxy
-$ docker run --name=test_data pirog/kaladata-docker
-$ docker run -d -t -e VIRTUAL_HOST=test.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes-from="test_data" --name="test.kala" --hostname="test.kala" pirog/kalastack-docker:12.04
+cd ~
+# Get a copy of the kalastack-docker project.
+git clone https://github.com/kalamuna/kalastack-docker.git
+# Perform Mac installation.
+cd kalastack-docker/macosx
+./setup.sh
+# Connect to the Docker VM.
+boot2docker ssh
+# Start the container.
+docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock -t pirog/kalabox-proxy
+docker run --name=test_data pirog/kaladata-docker
+docker run -d -t \
+  -e VIRTUAL_HOST=test.kala \
+  -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 \
+  --volumes-from="test_data" \
+  --name="test.kala" \
+  --hostname="test.kala" \
+  pirog/kalastack-docker:12.04
 ```
 
 In order to access your webserver in your browser you wil want to add an entry into your /etc/hosts file. In order to do this you need to find the docker vm ip address.
@@ -70,7 +76,7 @@ code onto your host machine and sync it into your container with
 
 With scp
 ```
-$ scp -rp -P 49171 ~/mycode/* root@test.kala:/data/code/
+scp -rp -P 49171 ~/mycode/* root@test.kala:/data/code/
 ```
 
 With rsync over ssh
@@ -156,31 +162,43 @@ To pull from the Docker Index simply run
 To build from source run the following
 
 ```
-$ git clone https://github.com/kalamuna/kalastack-docker.git
-$ cd kalastack-docker
-$ docker build --tag="pirog/kalastack-docker" .
+git clone https://github.com/kalamuna/kalastack-docker.git
+cd kalastack-docker
+docker build --tag="pirog/kalastack-docker" .
 ```
 
 ### Start your container
 
-VIRTUAL_HOST and VIRTUAL_PORT tell the kalabox-proxy how to route your request. VIRTUAL_HOST should be the address you want to enter into your browser to access your site. VIRTUAL_PORT should almost always be 80. You will want to add an entry into your /etc/hosts file on the host side to facilitate the magic. Please consult "Your VM IP address" below for more details.
+VIRTUAL_HOST and VIRTUAL_PORT tell the kalabox-proxy how to route your request.
+VIRTUAL_HOST should be the address you want to enter into your browser to access
+your site. VIRTUAL_PORT should almost always be 80. You will want to add an
+entry into your /etc/hosts file on the host side to facilitate the magic.
+Please consult "Your VM IP address" below for more details.
 
 ```
-$ docker run -d -t -e VIRTUAL_HOST=test.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes-from="test_data" --name="test.kala" --hostname="test.kala" pirog/kalastack-docker:12.04
+docker run -d -t \
+  -e VIRTUAL_HOST=test.kala \
+  -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 \
+  --volumes-from="test_data" \
+  --name="test.kala" \
+  --hostname="test.kala" \
+  pirog/kalastack-docker:12.04
 ```
 
 ## Uninstall
 
-The best way to uninstall this whole thing either because you hate it or to try to reinstall is to run the following commands from your host machine
+The best way to uninstall this whole thing either because you hate it or to try
+to reinstall is to run the following commands from your host machine
 
 ```
-$ boot2docker stop
-$ boot2docker delete
-$ sudo rm /usr/local/bin/boot2docker
-$ rm -rf ~/.boot2docker
+boot2docker stop
+boot2docker delete
+sudo rm /usr/local/bin/boot2docker
+rm -rf ~/.boot2docker
 ```
 
-Optionally, and if you are feeling RISKY. You can uninstall VirtualBox with teh uninstall.tool that ships with the VB DMG.
+Optionally, and if you are feeling RISKY. You can uninstall VirtualBox with the
+uninstall.tool that ships with the VB DMG.
 
 ## Contributing
 Feel free to fork and contribute to this code. :)
@@ -193,7 +211,7 @@ Feel free to fork and contribute to this code. :)
 
 ## Authors
 
-Forked from/based on the [drupal-docker-nginx](https://github.com/ricardoamaro/docker-drupal-nginx) project by  [Ricardo Amaro](https://github.com/ricardoamaro) (<mail@ricardoamaro.com>)
+Forked from/based on the [drupal-docker-nginx](https://github.com/ricardoamaro/docker-drupal-nginx) project by [Ricardo Amaro](https://github.com/ricardoamaro) (<mail@ricardoamaro.com>)
 
 ## License
 GPL v3
