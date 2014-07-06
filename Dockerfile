@@ -25,6 +25,7 @@ ENV COMPOSER_BIN_DIR /usr/local/bin
 RUN composer global require drush/drush:6.*
 RUN git clone https://github.com/fluxsauce/switchboard.git $HOME/.drush/switchboard
 RUN cd $HOME/.drush/switchboard && composer update --no-dev
+RUN chmod 755 -R $HOME/.drush/switchboard/vendor
 RUN drush cc drush
 # Weird fix for SSH to D
 RUN mkdir -p /var/run/sshd
