@@ -3,6 +3,7 @@
 
 FROM ubuntu:12.04
 MAINTAINER John Ouellet <john@kalamuna.com>
+ENV HOME /root
 
 RUN apt-get update
 
@@ -12,7 +13,7 @@ RUN dpkg-divert --local --rename --add /sbin/initctl
 # Basic requirements for Kalabox/Switchboard-based containers
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install apt-utils
 RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure apt-utils
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git rsync curl openssh-server php5 php5-curl php5-sqlite php5-mcrypt mysql-client python-setuptools
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git nano sysv-rc rsync curl openssh-server php5 php5-curl php5-sqlite php5-mcrypt mysql-client python-setuptools
 # Install composer and set it vendor dir to $PATH
 RUN curl -sS https://getcomposer.org/installer | php
 RUN mv composer.phar /usr/local/bin/composer
@@ -22,8 +23,8 @@ ENV COMPOSER_HOME /usr/share/composer
 ENV COMPOSER_BIN_DIR /usr/local/bin
 # Install DRUSH and Switchboard
 RUN composer global require drush/drush:6.*
-RUN git clone https://github.com/fluxsauce/switchboard.git /usr/share/composer/vendor/drush/drush/commands/switchboard
-RUN cd /usr/share/composer/vendor/drush/drush/commands/switchboard && composer update --no-dev
+RUN git clone https://github.com/fluxsauce/switchboard.git $HOME/.drush/switchboard
+RUN cd $HOME/.drush/switchboard && composer update --no-dev
 RUN drush cc drush
 # Weird fix for SSH to D
 RUN mkdir -p /var/run/sshd
