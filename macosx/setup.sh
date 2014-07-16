@@ -49,15 +49,15 @@ if [ "$my_answer" == "1" ]; then
     # Just start the sudo party
     echo "Let's get it started!"
 
-    # Install Boot2Docker 
+    # Install Boot2Docker
     B2D_INSTALLED=$(system_profiler SPApplicationsDataType | grep boot2docker)
     if [ -z "$B2D_INSTALLED" ]; then
         echo "Downloading Boot2Docker..."
         cd /tmp
         curl -O http://files.kalamuna.com/boot2docker-macosx-1.1.1.pkg
-        MACVOL=$(diskutil info / | grep "Volume Name:" | awk '{print $3}')
+        MACVOL=$(diskutil info / | sed -n '/Volume Name:/ s/.*Volume Name: *//p')
         echo "Your Mac volume is called $MACVOL"
-        /usr/bin/sudo -p "Please enter %u's password:" installer -pkg /tmp/boot2docker-macosx-1.1.1.pkg -target /Volumes/$MACVOL
+        /usr/bin/sudo -p "Please enter %u's password:" installer -pkg /tmp/boot2docker-macosx-1.1.1.pkg -target /Volumes/"$MACVOL"
         echo "Boot2Docker Installed!"
     fi
 
@@ -87,8 +87,8 @@ if [ "$my_answer" == "1" ]; then
     docker run --name=test_data pirog/kaladata-docker
     docker run -d -t -e VIRTUAL_HOST=test.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes-from="test_data" --name="test.kala" --hostname="test.kala" pirog/kalastack-docker:12.04
 
-    # Add a hosts entry 
-    # 1.3.3.7 test.kala 
+    # Add a hosts entry
+    # 1.3.3.7 test.kala
     # usr/bin/sudo -p "Please enter %u's password:" echo "$B2D_IP test.kala" >> /etc/hosts
 fi
 
