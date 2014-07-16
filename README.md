@@ -16,22 +16,10 @@ git clone https://github.com/kalamuna/kalastack-docker.git
 # Perform Mac installation.
 cd kalastack-docker/macosx
 ./setup.sh
-# Connect to the Docker VM.
-boot2docker ssh
-# Start the container.
-docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock -t pirog/kalabox-proxy
-docker run --name=test_data pirog/kaladata-docker
-docker run -d -t \
-  -e VIRTUAL_HOST=test.kala \
-  -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 \
-  --volumes-from="test_data" \
-  --name="test.kala" \
-  --hostname="test.kala" \
-  pirog/kalastack-docker:12.04
 ```
 
-In order to access your webserver in your browser you wil want to add an entry into your /etc/hosts file. In order to do this you need to find the docker vm ip address.
-Generally you can find this by running `ifconfig` inside your docker vm. If you aren't doing anything weird this will usually be something like 1.3.3.7. You may also wish to check your boot2docker config to see if an alternate IP address is being used. You can do that by running `boot2docker config` on your host machine. Once you discover this IP address you want to add an entry into the /etc/hosts file on you hosts machine like this:
+In order to access your webserver in your browser you wil want to add an entry into your /etc/hosts file. To do this you need to find the docker vm ip address. 
+Luckily it is really easy to do this now by running `boot2docker ip` Once you discover this IP address you want to add an entry into the /etc/hosts file on you hosts machine like this:
 
 ```
 1.3.3.7 test.kala
@@ -188,17 +176,14 @@ docker run -d -t \
 ## Uninstall
 
 The best way to uninstall this whole thing either because you hate it or to try
-to reinstall is to run the following commands from your host machine
+to reinstall is to use the uninstall script packaged with the repo
 
 ```
-boot2docker stop
-boot2docker delete
-sudo rm /usr/local/bin/boot2docker
-rm -rf ~/.boot2docker
+# Return to where you cloned or downloaded the kalastack-docker code
+cd ~
+cd kalastack-docker/macosx
+./uninstall.sh
 ```
-
-Optionally, and if you are feeling RISKY. You can uninstall VirtualBox with the
-uninstall.tool that ships with the VB DMG.
 
 ## Contributing
 Feel free to fork and contribute to this code. :)

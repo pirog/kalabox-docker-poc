@@ -25,67 +25,46 @@ function key_exit() {
 echo ""
 echo "Welcome to the kalastack-docker server install script."
 echo ""
-echo "This script will help you get started running kalastack-docker"
+echo "This script will help you get started running Kalabox"
 echo ""
 echo ""
 echo "WHATCHA WHATCHA WHATCHA WANT?"
 echo ""
-echo "1. Install everything I need and set up a webserver for me."
-echo "2. Install just the server dependencies."
-echo "3. Forget this ever happened."
+echo "1. Install all the things."
+echo "2. Forget this ever happened."
 echo ""
 read my_answer
-if [ "$my_answer" == "3" ]; then
+if [ "$my_answer" == "2" ]; then
     echo "This never happened."
     key_exit 2
 fi
 
-# Initiate the actual uninstall, which requires admin privileges.
-echo "The installation process requires administrative privileges"
-echo "because some of the installed files cannot be removed by a"
-echo "normal user. You may now be prompted for a password..."
-
-# Just start the sudo party
-sudo -p "Please enter %u's password:" echo "Let's get it started"
-
-# Install VirtualBox
-VBOX=$(which VBoxManage)
-if [ -z "$VBOX" ]; then
-    echo "Downloading VirtualBox..."
-    cd /tmp
-    curl -O http://files.kalamuna.com/virtualbox-macosx-4.3.6.dmg
-    echo "Mounting VirtualBox..."
-    if [ -d /Volumes/VirtualBox ]; then
-        hdiutil detach /Volumes/VirtualBox -force
-    fi
-    hdiutil attach /tmp/virtualbox-macosx-4.3.6.dmg
-    echo "Installing VirtualBox..."
-    sudo installer -pkg /Volumes/VirtualBox/VirtualBox.pkg -target /Volumes/Macintosh\ HD
-    hdiutil detach /Volumes/VirtualBox -force
-    echo "VirtualBox Installed!"
-fi
-
-# Install Boot2Docker
-B2D=$(which boot2docker)
-if [ -z "$B2D" ]; then
-    echo "Downloading Boot2Docker..."
-    cd /tmp
-    curl -O http://files.kalamuna.com/boot2docker-v0.9.2-darwin-amd64
-    echo "Installing Boot2Docker..."
-    sudo mv /tmp/boot2docker-v0.9.2-darwin-amd64 /usr/local/bin/boot2docker
-    sudo chmod +x /usr/local/bin/boot2docker
-    echo "Boot2Docker Installed!"
-fi
-
-#!/usr/bin/env bash
+# Setup the VM and get docker ready
 if [ "$my_answer" == "1" ]; then
+    # Initiate the actual uninstall, which requires admin privileges.
+    echo "The installation process requires administrative privileges"
+    echo "because some of the installed files cannot be removed by a"
+    echo "normal user. You may now be prompted for a password..."
+
+    # Just start the sudo party
+    echo "Let's get it started!"
+
+    # Install Boot2Docker 
+    B2D_INSTALLED=$(system_profiler SPApplicationsDataType | grep boot2docker)
+    if [ -z "$B2D_INSTALLED" ]; then
+        echo "Downloading Boot2Docker..."
+        cd /tmp
+        curl -O http://files.kalamuna.com/boot2docker-macosx-1.1.1.pkg
+        MACVOL=$(diskutil info / | grep "Volume Name:" | awk '{print $3}')
+        echo "Your Mac volume is called $MACVOL"
+        /usr/bin/sudo -p "Please enter %u's password:" installer -pkg /tmp/boot2docker-macosx-1.1.1.pkg -target /Volumes/$MACVOL
+        echo "Boot2Docker Installed!"
+    fi
+
     echo "Spinning up the hypervisor..."
     B2D_DIR=$HOME/.boot2docker
     if [ ! -d "$B2D_DIR" ]; then
         mkdir -p "$B2D_DIR"
-    fi
-    if [ -a $B2D_DIR/boot2docker.iso ]; then
-        rm $B2D_DIR/boot2docker.iso
     fi
     # @todo eventually we want to do something less instrusive like this
     # export BOOT2DOCKER_PROFILE=$(pwd)/boot2docker.profile
@@ -98,44 +77,19 @@ if [ "$my_answer" == "1" ]; then
     cd $HOME
     boot2docker init
     boot2docker up
+    # Not sure if we need to set this correctly
+    B2D_IP=$(boot2docker ip 2>/dev/null)
+    export DOCKER_HOST=tcp://$B2D_IP:2375
 
-    # Get all our images
-    # Data only container
-    curl -XPOST http://localhost:4243/images/create --data fromImage=busybox --data tag=latest
-    curl -XPOST http://localhost:4243/images/create --data fromImage=pirog/kaladata-docker --data tag=latest
-    # Ubuntu 12.04
-    curl -XPOST http://localhost:4243/images/create --data fromImage=ubuntu --data tag=12.04
-    # Reverse Proxy
-    curl -XPOST http://localhost:4243/images/create --data fromImage=pirog/kalabox-proxy --data tag=latest
-    # Kalastack Docker
-    curl -XPOST http://localhost:4243/images/create --data fromImage=pirog/kalastack-docker --data tag=12.04
+    # Spin up all the containers we need to get starter
+    # @todo: We should remove this for now
+    docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock -t pirog/kalabox-proxy
+    docker run --name=test_data pirog/kaladata-docker
+    docker run -d -t -e VIRTUAL_HOST=test.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes-from="test_data" --name="test.kala" --hostname="test.kala" pirog/kalastack-docker:12.04
 
-    # Set up the reverse proxy
-    #json=$(/usr/bin/curl -XPOST -H "Content-Type: application/json" http://localhost:4243/containers/create -d '
-    # {
-    # "Hostname":"proxy.kala",
-    # "User":"",
-    # "Memory":0,
-    # "MemorySwap":0,
-    # "AttachStdin":false,
-    # "AttachStdout":true,
-    # "AttachStderr":true,
-    # "PortSpecs":null,
-    # "Privileged": false,
-    # "Tty":false,
-    # "OpenStdin":false,
-    # "StdinOnce":false,
-    # "Env":null,
-    # "Dns":null,
-    # "Image":"pirog/kalabox-proxy",
-    # "Volumes":{},
-    # "VolumesFrom":"",
-    # "WorkingDir":""
-    #}')
-    #cid=$(echo $json | python -c 'import sys, json; print json.load(sys.stdin)[sys.argv[1]]' Id)
-    #/usr/bin/curl -XPOST http://localhost:4243/containers/$cid/start
-    #unset cid
-    #unset json
+    # Add a hosts entry 
+    # 1.3.3.7 test.kala 
+    # usr/bin/sudo -p "Please enter %u's password:" echo "$B2D_IP test.kala" >> /etc/hosts
 fi
 
 echo "Done."
