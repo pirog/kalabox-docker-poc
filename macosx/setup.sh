@@ -85,7 +85,7 @@ if [ "$my_answer" == "1" ]; then
     # @todo: We should remove this for now
     docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock -t pirog/kalabox-proxy
     docker run --name=test_data pirog/kaladata-docker
-    docker run -d -t -e VIRTUAL_HOST=test.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes-from="test_data" --name="test.kala" --hostname="test.kala" pirog/kalastack-docker:12.04
+    docker run -d -t -e VIRTUAL_HOST=test.kala -e VIRTUAL_PORT=80 -p :22 -p :80 -p :3306 --volumes-from="test_data" --name="test.kala" --hostname="test.kala" pirog/kalastack-docker:latest
 
     # Add a hosts entry
     # 1.3.3.7 test.kala
