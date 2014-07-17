@@ -18,7 +18,7 @@ cd kalastack-docker/macosx
 ./setup.sh
 ```
 
-In order to access your webserver in your browser you wil want to add an entry into your /etc/hosts file. To do this you need to find the docker vm ip address. 
+In order to access your webserver in your browser you wil want to add an entry into your /etc/hosts file. To do this you need to find the docker vm ip address.
 Luckily it is really easy to do this now by running `boot2docker ip` Once you discover this IP address you want to add an entry into the /etc/hosts file on you hosts machine like this:
 
 ```
@@ -33,7 +33,7 @@ You can run `docker ps` inside the docker vm to see what ports are doing in your
 
 ```
 CONTAINER ID        IMAGE                     COMMAND               CREATED             STATUS              PORTS                                                                   NAMES
-c69959c355ae        kalastack-docker:12.04   /bin/bash /start.sh   2 seconds ago       Up 1 seconds        0.0.0.0:49171->22/tcp, 0.0.0.0:49172->3306/tcp, 0.0.0.0:49173->80/tcp   test.kala
+c69959c355ae        kalastack-docker:latest   /bin/bash /start.sh   2 seconds ago       Up 1 seconds        0.0.0.0:49171->22/tcp, 0.0.0.0:49172->3306/tcp, 0.0.0.0:49173->80/tcp   test.kala
 ```
 
 In the above example the following service mappings apply
@@ -170,7 +170,7 @@ docker run -d -t \
   --volumes-from="test_data" \
   --name="test.kala" \
   --hostname="test.kala" \
-  pirog/kalastack-docker:12.04
+  pirog/kalastack-docker:latest
 ```
 
 ## Uninstall
