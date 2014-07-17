@@ -4,13 +4,14 @@
 FROM ubuntu:12.04
 MAINTAINER Mike Pirog <mike@kalamuna.com>
 
-RUN echo "deb http://archive.ubuntu.com/ubuntu raring main restricted universe multiverse" > /etc/apt/sources.list
+# Get the most recent things
 RUN apt-get update
-
 # Keep upstart from complaining
 RUN dpkg-divert --local --rename --add /sbin/initctl
 
 # Basic requirements for Kalabox/Switchboard-based containers
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install apt-utils
+RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure apt-utils
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git rsync curl openssh-server php5 php5-curl php5-sqlite php5-mcrypt mysql-client python-setuptools
 # Install composer and set it vendor dir to $PATH
 RUN curl -sS https://getcomposer.org/installer | php
@@ -61,16 +62,16 @@ RUN sed -i -e "s/post_max_size = 8M/post_max_size = 100M/g" /etc/php5/fpm/php.in
 RUN sed -i -e "s/upload_max_filesize = 2M/upload_max_filesize = 100M/g" /etc/php5/fpm/php.ini
 RUN find /etc/php5/cli/conf.d/ -name "*.ini" -exec sed -i -re 's/^(\s*)#(.*)/\1;\2/g' {} \;
 # php5-apc
-RUN sed -i '$a apc.shm_size=128M' /etc/php5/conf.d/20-apc.ini
-RUN sed -i '$a apc.include_once_override=0' /etc/php5/conf.d/20-apc.ini
+RUN sed -i '$a apc.shm_size=128M' /etc/php5/conf.d/apc.ini
+RUN sed -i '$a apc.include_once_override=0' /etc/php5/conf.d/apc.ini
 # php5-xdebug
 # @todo this assumes 1.3.3.1 is your host machine, need to abstract out
 # in the future
-RUN sed -i '$a xdebug.remote_host="1.3.3.1"' /etc/php5/conf.d/20-xdebug.ini
-RUN sed -i '$a xdebug.remote_enable=1' /etc/php5/conf.d/20-xdebug.ini
-RUN sed -i '$a xdebug.remote_port=9000' /etc/php5/conf.d/20-xdebug.ini
-RUN sed -i '$a xdebug.remote_handler="dbgp"' /etc/php5/conf.d/20-xdebug.ini
-RUN sed -i '$a xdebug.remote_autostart=1' /etc/php5/conf.d/20-xdebug.ini
+RUN sed -i '$a xdebug.remote_host="1.3.3.1"' /etc/php5/conf.d/xdebug.ini
+RUN sed -i '$a xdebug.remote_enable=1' /etc/php5/conf.d/xdebug.ini
+RUN sed -i '$a xdebug.remote_port=9000' /etc/php5/conf.d/xdebug.ini
+RUN sed -i '$a xdebug.remote_handler="dbgp"' /etc/php5/conf.d/xdebug.ini
+RUN sed -i '$a xdebug.remote_autostart=1' /etc/php5/conf.d/xdebug.ini
 
 # Supervisor Config
 RUN /usr/bin/easy_install supervisor
