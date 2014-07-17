@@ -12,7 +12,7 @@ RUN dpkg-divert --local --rename --add /sbin/initctl
 # Basic requirements for Kalabox/Switchboard-based containers
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install apt-utils
 RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure apt-utils
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git rsync curl openssh-server php5 php5-curl python-setuptools
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git rsync curl openssh-server php5 php5-curl php5-sqlite php5-mcrypt mysql-client python-setuptools
 # Install composer and set it vendor dir to $PATH
 RUN curl -sS https://getcomposer.org/installer | php
 RUN mv composer.phar /usr/local/bin/composer
@@ -36,7 +36,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install nginx
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-server
 
 # PHP
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install php5-gd php5-fpm php5-mysql
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install php5-gd php-pear php5-imap php5-fpm php5-mysql php-apc php5-xdebug
 
 # Is this a Twisted Sister pin? On your uniform?
 RUN apt-get clean
@@ -65,6 +65,19 @@ RUN sed -i -e "s/listen = 127.0.0.1:9000/listen = \/var\/run\/php5-fpm.sock/g" /
 RUN sed -i -e "s/;listen.owner = www-data/listen.owner = www-data/g" /etc/php5/fpm/pool.d/www.conf
 RUN sed -i -e "s/;listen.group = www-data/listen.group = www-data/g" /etc/php5/fpm/pool.d/www.conf
 RUN sed -i -e "s/;listen.mode = www-data/listen.mode = 0660/g" /etc/php5/fpm/pool.d/www.conf
+
+# php5-apc
+RUN sed -i '$a apc.shm_size=128M' /etc/php5/conf.d/apc.ini
+RUN sed -i '$a apc.include_once_override=0' /etc/php5/conf.d/apc.ini
+# php5-xdebug
+# @todo this assumes 1.3.3.1 is your host machine, need to abstract out
+# in the future
+RUN sed -i '$a xdebug.remote_host="1.3.3.1"' /etc/php5/conf.d/xdebug.ini
+RUN sed -i '$a xdebug.remote_enable=1' /etc/php5/conf.d/xdebug.ini
+RUN sed -i '$a xdebug.remote_port=9000' /etc/php5/conf.d/xdebug.ini
+RUN sed -i '$a xdebug.remote_handler="dbgp"' /etc/php5/conf.d/xdebug.ini
+RUN sed -i '$a ;remote_autostart causes php-fpm pool to take 4eva to respond on windows' /etc/php5/conf.d/xdebug.ini
+RUN sed -i '$a ;xdebug.remote_autostart=1' /etc/php5/conf.d/xdebug.ini
 
 # Supervisor Config
 RUN /usr/bin/easy_install supervisor
