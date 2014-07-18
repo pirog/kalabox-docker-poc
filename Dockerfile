@@ -36,7 +36,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install nginx
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-server
 
 # PHP
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install php5-gd php5-intl php-pear php5-imap php5-fpm php5-mysql php-apc php5-xdebug
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install php5-gd php-pear php5-imap php5-fpm php5-mysql php-apc php5-xdebug
 
 # Is this a Twisted Sister pin? On your uniform?
 RUN apt-get clean
@@ -76,7 +76,8 @@ RUN sed -i '$a xdebug.remote_host="1.3.3.1"' /etc/php5/conf.d/xdebug.ini
 RUN sed -i '$a xdebug.remote_enable=1' /etc/php5/conf.d/xdebug.ini
 RUN sed -i '$a xdebug.remote_port=9000' /etc/php5/conf.d/xdebug.ini
 RUN sed -i '$a xdebug.remote_handler="dbgp"' /etc/php5/conf.d/xdebug.ini
-RUN sed -i '$a xdebug.remote_autostart=1' /etc/php5/conf.d/xdebug.ini
+RUN sed -i '$a ;remote_autostart causes php-fpm pool to take 4eva to respond on windows' /etc/php5/conf.d/xdebug.ini
+RUN sed -i '$a ;xdebug.remote_autostart=1' /etc/php5/conf.d/xdebug.ini
 
 # Supervisor Config
 RUN /usr/bin/easy_install supervisor
