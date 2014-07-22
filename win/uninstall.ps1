@@ -10,18 +10,18 @@
 #
 
 # Stop and Remove Kalabox
+$vb = Get-WmiObject -Class win32_product | where { $_.Name -like "*VirtualBox*"}
 $b2d = ${env:ProgramFiles} + '\Boot2Docker for Windows\boot2docker.exe'
-If (Test-Path $b2d) {
+If ((Test-Path $b2d) -and $vb) {
     Write-Output "Stopping Kalabox..."
     & $b2d poweroff
     Write-Output "Removing Kalabox..."
     & $b2d delete
-    sleep 10
+    Sleep 5
 }
 
 # Uninstalling VirtualBox
 # @todo no
-$vb = Get-WmiObject -Class win32_product | where { $_.Name -like "*VirtualBox*"}
 if ($vb) {
     Write-Output "Uninstalling VirtualBox..."
     $arguments = "/uninstall $($vb.IdentifyingNumber) /quiet /norestart"  
@@ -63,6 +63,10 @@ If (Test-Path $b2d_conf_folder) {
     Remove-Item $b2d_conf_folder -recurse
     Write-Output "Removed boot2docker profile and images."
 }
-
+$vm_conf_path = ${env:userprofile} + '\Virtual Box VMs\Kalabox'
+If (Test-Path $vm_conf_path) {
+    Remove-Item $vm_conf_path -recurse
+    Write-Output "Removed Kalabox VM files"
+}
 # Uninstall Compelte
 Write-Output "Kalabox uninstalled succesfully!"
