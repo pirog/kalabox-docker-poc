@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Kalabox Server Install Script.
+# Kalabox Install Script.
 #
 # Copyright (C) 2014 Kalamuna LLC
 #

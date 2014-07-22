@@ -1,0 +1,8 @@
+[Setup]
+Lang=english
+Dir=C:\Program Files\Boot2Docker for Windows
+Group=Docker
+NoIcons=1
+SetupType=custom
+Components=boot2docker,msys,virtualbox
+Tasks=modifypath
